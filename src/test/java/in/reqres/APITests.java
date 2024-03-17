@@ -3,6 +3,7 @@ package in.reqres;
 import data.Login;
 import data.LoginFail;
 import data.Page;
+import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.testng.Assert;
@@ -71,5 +72,22 @@ public class APITests {
                 .then()
                 .body("token", notNullValue());
 
+    }
+
+    @Test
+    public void loginFailTest() {
+        installSpec(requestSpec(), responseSpec(400));
+
+        LoginFail login = new LoginFail();
+        login.setEmail("eve.holt@reqres.in");
+
+        JsonPath jsonResponse = given()
+                .body(login)
+                .when()
+                .post("/api/login")
+                .then()
+                .extract().response().jsonPath();
+        Assert.assertEquals(jsonResponse.get("error"), "Missing password",
+                "Ошибка ошибки");
     }
 }
