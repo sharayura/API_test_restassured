@@ -9,7 +9,7 @@ import java.util.List;
  * @author Sharapov Yuri
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Page {
+public class Page<T> {
     private int page;
 
     @JsonAlias({"per_page"})
@@ -20,7 +20,7 @@ public class Page {
     @JsonAlias({"total_pages"})
     private int totalPages;
 
-    private List<User> data;
+    private List<T> data;
 
     public int getPage() {
         return page;
@@ -54,11 +54,11 @@ public class Page {
         this.totalPages = totalPages;
     }
 
-    public List<User> getData() {
+    public List<T> getData() {
         return data;
     }
 
-    public void setData(List<User> data) {
+    public void setData(List<T> data) {
         this.data = data;
     }
 }

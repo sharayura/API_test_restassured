@@ -1,8 +1,6 @@
 package in.reqres;
 
-import data.Login;
-import data.LoginFail;
-import data.Page;
+import data.*;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -10,10 +8,8 @@ import org.testng.Assert;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.Test;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static Specification.Specification.*;
 import static io.restassured.RestAssured.*;
@@ -40,7 +36,7 @@ public class APITests {
                 .extract();
         Assert.assertEquals(resp.statusCode(), 200, "Статускод не тот");
 
-        List<String> fileNames = resp.body().as(Page.class).getData().stream()
+        List<String> fileNames = resp.body().as(UserPage.class).getData().stream()
                 .map(user -> {
                             String avatar = user.getAvatar();
                             return avatar.substring(avatar.lastIndexOf("/") + 1, avatar.lastIndexOf("."));
@@ -89,5 +85,21 @@ public class APITests {
                 .extract().response().jsonPath();
         Assert.assertEquals(jsonResponse.get("error"), "Missing password",
                 "Ошибка ошибки");
+    }
+
+    @Test
+    public void resourceTest() {
+        installSpec(requestSpec(), responseSpec(200));
+        ExtractableResponse<Response> resp = given()
+                .when()
+                .get("/api/unknown")
+                .then()
+                .extract();
+
+        List<Integer> sorted = resp.body().as(ResourcePage.class).getData().stream()
+                .map(Resource::getYear).collect(Collectors.toList());
+        List<Integer> unsorted = List.copyOf(sorted);
+        Collections.sort(sorted);
+        Assert.assertEquals(unsorted, sorted, "not sorted");
     }
 }
