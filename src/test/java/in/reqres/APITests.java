@@ -96,10 +96,25 @@ public class APITests {
                 .then()
                 .extract();
 
-        List<Integer> sorted = resp.body().as(ResourcePage.class).getData().stream()
+        List<Integer> sorted = resp.jsonPath().getList("data", Resource.class).stream()
                 .map(Resource::getYear).collect(Collectors.toList());
         List<Integer> unsorted = List.copyOf(sorted);
+        System.out.println(unsorted);
         Collections.sort(sorted);
         Assert.assertEquals(unsorted, sorted, "not sorted");
+    }
+
+    @Test
+    public void tagTest() {
+       String answer = given()
+                .when()
+                .get("https://gateway.autodns.com")
+                .then()
+                .log().body()
+                .extract().asString();
+
+       int count = answer.split("<[^\\/]").length - 1;
+       Assert.assertEquals(count, 15, "Тегов получилось " + count);
+
     }
 }
